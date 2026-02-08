@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cpp note</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="logo">cpp note</div>
+        <nav class="top-nav">
+            <a href="#" class="nav-item active" data-category="cpp">C++</a>
+            <a href="#" class="nav-item" data-category="os">操作系统</a>
+            <a href="#" class="nav-item" data-category="network">计算机网络</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <aside class="left-nav">
+            <div class="category-title">C++</div>
+            <ul class="article-list" id="articleList">
+                <!-- 文章列表将通过JS动态加载 -->
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div id="markdownContent" class="markdown-body">
+                <!-- Markdown内容将在这里渲染 -->
+            </div>
+        </main>
+
+        <aside class="right-nav">
+            <div class="toc-title">目录</div>
+            <nav class="toc" id="tableOfContents">
+                <!-- 目录将动态生成 -->
+            </nav>
+        </aside>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
