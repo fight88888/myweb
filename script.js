@@ -1,6 +1,7 @@
 // 文章数据配置
 const articles = {
     cpp: [
+        { title: 'C++ 面试知识点', file: 'cpp/c++.md' },
         { title: 'C++ 基础语法', file: 'cpp/cpp-basic.md' },
         { title: '面向对象编程', file: 'cpp/oop.md' },
         { title: 'STL 容器', file: 'cpp/stl.md' },
@@ -20,10 +21,12 @@ const articles = {
 
 let currentCategory = 'cpp';
 let currentArticle = null;
+let isSearching = false;
 
 // 初始化
 document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
+    initSearch();
     loadArticleList('cpp');
     loadMarkdown('cpp/cpp-basic.md');
 });
@@ -35,6 +38,8 @@ function initNavigation() {
         item.addEventListener('click', (e) => {
             e.preventDefault();
             const category = item.dataset.category;
+            isSearching = false;
+            document.getElementById('searchInput').value = '';
             
             // 更新导航状态
             navItems.forEach(nav => nav.classList.remove('active'));
@@ -45,6 +50,121 @@ function initNavigation() {
             currentCategory = category;
         });
     });
+}
+
+// 初始化搜索
+function initSearch() {
+    const searchInput = document.getElementById('searchInput');
+    
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim();
+        
+        if (query === '') {
+            isSearching = false;
+            loadArticleList(currentCategory);
+            return;
+        }
+        
+        isSearching = true;
+        searchArticles(query);
+    });
+    
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            searchInput.value = '';
+            isSearching = false;
+            loadArticleList(currentCategory);
+            searchInput.blur();
+        }
+    });
+    
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+        }
+    });
+}
+
+// 搜索文章
+function searchArticles(query) {
+    const articleList = document.getElementById('articleList');
+    const categoryTitle = document.querySelector('.category-title');
+    const searchQuery = query.toLowerCase();
+    
+    categoryTitle.textContent = '搜索结果';
+    
+    // 收集所有文章
+    let allArticles = [];
+    Object.keys(articles).forEach(category => {
+        articles[category].forEach(article => {
+            allArticles.push({
+                ...article,
+                category: category
+            });
+        });
+    });
+    
+    // 过滤文章
+    const filteredArticles = allArticles.filter(article =>
+        article.title.toLowerCase().includes(searchQuery)
+    );
+    
+    if (filteredArticles.length === 0) {
+        articleList.innerHTML = `
+            <li style="padding: 1rem; text-align: center; color: #9ca3af;">
+                未找到匹配的文章
+            </li>
+        `;
+        return;
+    }
+    
+    // 生成搜索结果
+    articleList.innerHTML = filteredArticles.map(article => `
+        <li>
+            <a href="#" data-file="${article.file}" data-category="${article.category}">
+                ${article.title}
+                <span style="display: block; font-size: 0.8rem; color: #9ca3af; margin-top: 0.25rem;">
+                    ${getCategoryName(article.category)}
+                </span>
+            </a>
+        </li>
+    `).join('');
+    
+    // 添加点击事件
+    articleList.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const file = link.dataset.file;
+            const category = link.dataset.category;
+            
+            // 更新活动状态
+            articleList.querySelectorAll('a').forEach(a => a.classList.remove('active'));
+            link.classList.add('active');
+            
+            // 加载文章
+            loadMarkdown(file);
+            
+            // 更新导航状态
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(nav => {
+                nav.classList.remove('active');
+                if (nav.dataset.category === category) {
+                    nav.classList.add('active');
+                }
+            });
+        });
+    });
+}
+
+// 获取分类名称
+function getCategoryName(category) {
+    const nameMap = {
+        cpp: 'C++',
+        os: '操作系统',
+        network: '计算机网络'
+    };
+    return nameMap[category] || category;
 }
 
 // 加载文章列表
